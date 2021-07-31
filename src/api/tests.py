@@ -4,22 +4,22 @@ from django.urls import reverse
 from .models import Car
 
 
-class CarsViewTest(TestCase):
+class CarBasedViewTest(TestCase):
 
-    __correct_make = 'Volkswagen'
-    __correct_model = 'Golf'
-    __incorrect_make = 'Wolkswagen'
-    __incorrect_model = 'GolF'
-    __correct_makes_and_models = [
-        (__correct_make, __correct_model),
+    correct_make = 'Volkswagen'
+    correct_model = 'Golf'
+    incorrect_make = 'Wolkswagen'
+    incorrect_model = 'GolF'
+    correct_make_and_model_set = [
+        (correct_make, correct_model),
         ('Honda', 'Civic'),
         ('BMW', '533i')
     ]
 
-    def __make_get_request(self):
+    def make_get_request(self):
         return self.client.get(reverse("api:cars"))
 
-    def __make_post_request(self, make, model):
+    def make_post_request(self, make, model):
         data = {}
         if make:
             data['make'] = make
@@ -30,24 +30,30 @@ class CarsViewTest(TestCase):
             json.dumps(data),
             content_type="application/json")
 
-    def __assertCarCreated(self, response, make, model):
+    def make_delete_request(self, id):
+        return self.client.delete(reverse("api:cars_update", kwargs={'car_id': id}))
+
+    def assertCarCreated(self, response, make, model):
         self.assertEqual(response.status_code, 201)
         response_id = json.loads(response.content.decode("utf-8")).get('id')
         self.assertIsNotNone(response_id)
         car_set = Car.objects.filter(id=response_id)
         self.assertQuerysetEqual(car_set, [Car(response_id, make, model)])
 
-    def __assertError(self, response, status_code, detail):
+    def assertError(self, response, status_code, detail=None):
         self.assertEqual(response.status_code, status_code)
         response_detail = json.loads(
             response.content.decode("utf-8")).get('details')
-        self.assertIsNotNone(response_detail)
-        self.assertEqual(response_detail, detail)
+        if detail:
+            self.assertEqual(response_detail, detail)
+
+
+class CarsViewTest(CarBasedViewTest):
 
     def test_list_cars(self):
         car_set = []
-        for mkmd in self.__correct_makes_and_models:
-            response = self.__make_post_request(mkmd[0], mkmd[1])
+        for mkmd in self.correct_make_and_model_set:
+            response = self.make_post_request(mkmd[0], mkmd[1])
             response_id = json.loads(
                 response.content.decode("utf-8")).get('id')
             self.assertIsNotNone(response_id)
@@ -56,7 +62,7 @@ class CarsViewTest(TestCase):
                 'make': mkmd[0],
                 'model': mkmd[1]
             })
-        response = self.__make_get_request()
+        response = self.make_get_request()
         response_data = json.loads(response.content.decode("utf-8"))
         for car in car_set:
             is_present = False
@@ -71,64 +77,97 @@ class CarsViewTest(TestCase):
             self.assertTrue(is_present)
 
     def test_create_car(self):
-        make = self.__correct_make
-        model = self.__correct_model
-        response = self.__make_post_request(make, model)
-        self.__assertCarCreated(response, make, model)
+        make = self.correct_make
+        model = self.correct_model
+        response = self.make_post_request(make, model)
+        self.assertCarCreated(response, make, model)
 
     def test_create_car_duplicate(self):
-        make = self.__correct_make
-        model = self.__correct_model
+        make = self.correct_make
+        model = self.correct_model
         responses = []
         for _ in range(2):
-            responses.append(self.__make_post_request(make, model))
+            responses.append(self.make_post_request(make, model))
         for response in responses:
-            self.__assertCarCreated(response, make, model)
+            self.assertCarCreated(response, make, model)
 
     def test_create_car_no_make_attribute(self):
         make = None
-        model = self.__correct_model
-        response = self.__make_post_request(make, model)
-        self.__assertError(response, 400, 'make')
+        model = self.correct_model
+        response = self.make_post_request(make, model)
+        self.assertError(response, 400, 'make')
 
     def test_create_car_no_model_attribute(self):
-        make = self.__correct_make
+        make = self.correct_make
         model = None
-        response = self.__make_post_request(make, model)
+        response = self.make_post_request(make, model)
         self.assertEqual(response.status_code, 400)
-        self.__assertError(response, 400, 'model')
+        self.assertError(response, 400, 'model')
 
     def test_create_car_make_does_not_exist(self):
-        make = self.__incorrect_make
-        model = self.__correct_model
-        response = self.__make_post_request(make, model)
-        self.__assertError(response, 404, make)
+        make = self.incorrect_make
+        model = self.correct_model
+        response = self.make_post_request(make, model)
+        self.assertError(response, 404, make)
 
     def test_create_car_model_does_not_exist(self):
-        make = self.__correct_make
-        model = self.__incorrect_model
-        response = self.__make_post_request(make, model)
-        self.__assertError(response, 404, model)
+        make = self.correct_make
+        model = self.incorrect_model
+        response = self.make_post_request(make, model)
+        self.assertError(response, 404, model)
 
     def test_create_car_lowercase_make(self):
-        make = self.__correct_make.lower()
-        model = self.__correct_model
-        response = self.__make_post_request(make, model)
-        self.__assertCarCreated(response, make, model)
+        make = self.correct_make.lower()
+        model = self.correct_model
+        response = self.make_post_request(make, model)
+        self.assertCarCreated(response, make, model)
 
     def test_create_car_lowercase_model(self):
-        make = self.__correct_make
-        model = self.__correct_model.lower()
-        response = self.__make_post_request(make, model)
-        self.__assertError(response, 404, model)
+        make = self.correct_make
+        model = self.correct_model.lower()
+        response = self.make_post_request(make, model)
+        self.assertError(response, 404, model)
 
 
-class CarsUpdateViewTest(TestCase):
-    pass
+class CarsUpdateViewTest(CarBasedViewTest):
+
+    def test_delete_car(self):
+        make = self.correct_make
+        model = self.correct_model
+        response = self.make_post_request(make, model)
+        self.assertCarCreated(response, make, model)
+        response_id = json.loads(response.content.decode("utf-8")).get('id')
+        self.assertIsNotNone(response_id)
+        response = self.make_delete_request(response_id)
+        self.assertEqual(response.status_code, 200)
+        car_set = Car.objects.filter(id=response_id)
+        self.assertQuerysetEqual(car_set, [])
+
+    def test_delete_car_car_does_not_exist(self):
+        id = 0
+        response = self.make_delete_request(id)
+        self.assertError(response, 404, id)
 
 
 class RateViewTest(TestCase):
-    pass
+
+    def test_create_rating(self):
+        pass
+
+    def test_create_rating_multiple(self):
+        pass
+
+    def test_create_rating_car_does_not_exist(self):
+        pass
+
+    def test_create_rating_string_value(self):
+        pass
+
+    def test_create_rating_too_low(self):
+        pass
+
+    def test_create_rating_too_high(self):
+        pass
 
 
 class PopularViewTest(TestCase):
