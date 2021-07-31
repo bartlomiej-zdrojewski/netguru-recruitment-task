@@ -1,0 +1,153 @@
+{
+	"info": {
+		"_postman_id": "5b55785c-13fe-4b12-be7b-f2b94546ea6b",
+		"name": "Netguru Recruitment Task",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get models for make",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMake/volkswagen?format=json",
+					"protocol": "http",
+					"host": [
+						"vpic",
+						"nhtsa",
+						"dot",
+						"gov"
+					],
+					"path": [
+						"api",
+						"vehicles",
+						"GetModelsForMake",
+						"volkswagen"
+					],
+					"query": [
+						{
+							"key": "format",
+							"value": "json"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a car",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"make\" : \"Volkswagen\",\n  \"model\" : \"Golf\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/cars/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"cars",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a car",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/cars/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"cars",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Rate a car",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"car_id\" : 1,\n  \"rating\" : 5\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/rate",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"rate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List the cars",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/cars/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"cars",
+						""
+					]
+				},
+				"description": "Should fetch a list of all cars already present in application database with their current average rate."
+			},
+			"response": []
+		},
+		{
+			"name": "List the popular cars",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/popular/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"popular",
+						""
+					]
+				},
+				"description": "Should return top cars already present in the database ranking based on a number of rates (not average rate values, it's important!)."
+			},
+			"response": []
+		}
+	]
+}
