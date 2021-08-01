@@ -7,5 +7,5 @@ class Car(models.Model):
 
 
 class Rating(models.Model):
-    value = models.IntegerField()
+    value = models.FloatField()
     car = models.ForeignKey(Car, on_delete=models.CASCADE)

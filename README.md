@@ -20,6 +20,7 @@ password: zaq1@WSX
 API
 allows duplicates
 if no rating for a car -> avg_rating = 0
+popular returns top 5 cars
 
 ## TODO
 

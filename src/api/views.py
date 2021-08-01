@@ -48,7 +48,10 @@ class Cars(View):
             if not atr in request_data:
                 message = 'The request is missing an attribute: {}'.format(atr)
                 details = atr
-                return JsonResponse({'message': message, 'details': details}, status=400)
+                return JsonResponse(
+                    {'message': message, 'details': details},
+                    status=400
+                )
         make = request_data.get('make')
         model = request_data.get('model')
         try:
@@ -106,12 +109,16 @@ class Cars(View):
 class CarsUpdate(View):
 
     def delete(self, request, car_id):
-        car_set = Car.objects.filter(id=car_id)
-        if car_set.count() == 0:
+        try:
+            car = Car.objects.get(id=car_id)
+        except Car.DoesNotExist:
             message = 'The car does not exist'
             details = car_id
-            return JsonResponse({'message': message, 'details': details}, status=404)
-        car_set.delete()
+            return JsonResponse(
+                {'message': message, 'details': details},
+                status=404
+            )
+        car.delete()
         return JsonResponse({}, status=200)
 
 
@@ -124,22 +131,35 @@ class Rate(View):
             if not atr in request_data:
                 message = 'The request is missing an attribute: {}'.format(atr)
                 details = atr
-                return JsonResponse({'message': message, 'details': details}, status=400)
+                return JsonResponse(
+                    {'message': message, 'details': details},
+                    status=400
+                )
         car_id = request_data.get('car_id')
         rating = request_data.get('rating')
-        car = self.__get_car(car_id)
-        if not car:
+        try:
+            car = Car.objects.get(id=car_id)
+        except Car.DoesNotExist:
             message = 'The car does not exist'
             details = car_id
-            return JsonResponse({'message': message, 'details': details}, status=404)
-        if not isinstance(rating, int):
-            message = 'The rating must have an int type'
+            return JsonResponse(
+                {'message': message, 'details': details},
+                status=404
+            )
+        if not isinstance(rating, (int, float)):
+            message = 'The rating must have an int or float type'
             details = rating
-            return JsonResponse({'message': message, 'details': details}, status=400)
+            return JsonResponse(
+                {'message': message, 'details': details},
+                status=400
+            )
         if rating < 1 or rating > 5:
             message = 'The rating must be between 1 and 5'
             details = rating
-            return JsonResponse({'message': message, 'details': details}, status=400)
+            return JsonResponse(
+                {'message': message, 'details': details},
+                status=400
+            )
         rating_data = {
             'value': rating,
             'car': car
@@ -147,16 +167,10 @@ class Rate(View):
         rating = Rating.objects.create(**rating_data)
         return JsonResponse({'id': rating.id}, status=201)
 
-    def __get_car(self, car_id):
-        car_set = Car.objects.filter(id=car_id)
-        if car_set.count() == 0:
-            return None
-        return car_set[0]
-
 
 @method_decorator(csrf_exempt, name='dispatch')
 class Popular(View):
 
     def get(self, request):
-        # TODO
+        # TODO top 5 cars
         pass
