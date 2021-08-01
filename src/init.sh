@@ -12,9 +12,9 @@ if [ "$DJANGO_TESTS" = "True" ]; then
 fi
 
 if [ "$DJANGO_DEBUG" = "True" ]; then
-    echo "INIT | Starting server in debug mode..."
+    echo "INIT | Launching server in debug mode..."
     python manage.py runserver 0.0.0.0:8000
 else
-    echo "INIT | Starting server in production mode..."
+    echo "INIT | Launching server in production mode..."
     gunicorn --bind 0.0.0.0:8000 app.wsgi
 fi

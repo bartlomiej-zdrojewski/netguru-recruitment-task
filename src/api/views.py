@@ -27,8 +27,8 @@ class Cars(View):
                 status=self.status)
 
     def get(self, request):
-        car_set = Car.objects.all()
         response_data = []
+        car_set = Car.objects.all()
         for car in car_set.iterator():
             avg_rating = Rating.objects.filter(
                 car__id=car.id).aggregate(Avg('value')).get('value__avg')
@@ -85,6 +85,7 @@ class Cars(View):
         try:
             data = request.json()
             for res in data['Results']:
+                # case-insensitive
                 if res['Make_Name'].lower() != make.lower():
                     continue
                 does_make_exist = True
@@ -172,5 +173,23 @@ class Rate(View):
 class Popular(View):
 
     def get(self, request):
-        # TODO top 5 cars
-        pass
+        count = -1
+        if 'count' in request.GET:
+            try:
+                count = int(request.GET['count'])
+            except ValueError:
+                pass
+        response_data = []
+        car_set = Car.objects.all()
+        for car in car_set.iterator():
+            rates_number = Rating.objects.filter(car__id=car.id).count()
+            response_data.append({
+                'id': car.id,
+                'make': car.make,
+                'model': car.model,
+                'rates_number': rates_number
+            })
+        response_data.sort(key=lambda x: x['rates_number'], reverse=True)
+        if count >= 0:
+            response_data = response_data[:count]
+        return JsonResponse(response_data, safe=False, status=200)
