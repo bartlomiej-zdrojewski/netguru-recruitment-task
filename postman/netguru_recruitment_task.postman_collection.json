@@ -150,6 +150,32 @@
 				"description": "Should return top cars already present in the database ranking based on a number of rates (not average rate values, it's important!)."
 			},
 			"response": []
+		},
+		{
+			"name": "List the popular cars [count]",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/popular/?count=1",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"popular",
+						""
+					],
+					"query": [
+						{
+							"key": "count",
+							"value": "1"
+						}
+					]
+				},
+				"description": "Should return top cars already present in the database ranking based on a number of rates (not average rate values, it's important!)."
+			},
+			"response": []
 		}
 	]
 }

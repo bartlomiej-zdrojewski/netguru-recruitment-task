@@ -55,7 +55,7 @@ The default port is `8000`. To change it, you have to edit the
 While implementing the API, the following assumptions were made:
 
 - all endpoints must end in a trailing slash `/`; it will not matter in `GET`
-request but may return an error in `POST` and `DELETE` requests;
+requests but may return an error in `POST` and `DELETE` requests;
 
 - `/cars` endpoint allows creating cars with the same mark and model;
 
