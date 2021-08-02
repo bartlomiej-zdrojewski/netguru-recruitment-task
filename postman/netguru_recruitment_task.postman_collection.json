@@ -66,17 +66,18 @@
 		{
 			"name": "Delete a car",
 			"request": {
-				"method": "GET",
+				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "localhost:8000/cars/1",
+					"raw": "localhost:8000/cars/1/",
 					"host": [
 						"localhost"
 					],
 					"port": "8000",
 					"path": [
 						"cars",
-						"1"
+						"1",
+						""
 					]
 				}
 			},
@@ -97,13 +98,14 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8000/rate",
+					"raw": "localhost:8000/rate/",
 					"host": [
 						"localhost"
 					],
 					"port": "8000",
 					"path": [
-						"rate"
+						"rate",
+						""
 					]
 				}
 			},
